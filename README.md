@@ -25,7 +25,7 @@ This project demonstrates real-time data streaming and processing architecture u
 - **Docker**: Containerization for running the services.
 
 ## Architecture
-![Architecture Diagram](images/Architecture.gif)
+![Architecture Diagram](images/Architecture.png)
 
 ### Key Components:
 - **PostgreSQL**: Source database for transactional data.
@@ -227,7 +227,6 @@ Here's a preview of the real-time dashboard:
 
 ![Dashboard Overview](images/dashboard.png)
 
-you can watch the demo video <a href="https://www.youtube.com/watch?v=OeddlyLVAuQ" target="_blank">here</a> 
 
 ## Acknowledgments
 Special thanks to the teams and open-source communities behind Kafka, Spark Streaming, Debezium, and Docker for making this project possible.
@@ -236,6 +235,6 @@ Special thanks to the teams and open-source communities behind Kafka, Spark Stre
 This project showcases how CDC and real-time data processing can be implemented using Kafka, Debezium, and Spark Streaming. It demonstrates a complete flow from data ingestion to processing and visualization in a dashboard.
 
 ## Contacts
-- **Developer**: Aymane-MG [Data & Software Engineer]
-- **Email**: aymanemaghouti16@gmail.com
-- **LinkedIn:** <a href="https://www.linkedin.com/in/aymane-maghouti/" target="_blank">Aymane Maghouti</a><br>
+- **Developer**: Ashrith Vavillapally
+- **Email**: ashrith.31083124@gmail.com
+
