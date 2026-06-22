@@ -1,240 +1,456 @@
-# Real-Time Data Streaming & Processing with Kafka, Spark Streaming & Debezium
+# ⚡ Real-Time Data Streaming & Processing Platform
 
-## Table of Contents
-1. [Project Overview](#project-overview)
-2. [Technologies Used](#technologies-used)
-3. [Architecture](#architecture)
-4. [Software Requirements for Running the Project](#software-requirements-for-running-the-project)
-5. [How to Run](#how-to-run)
-6. [Dashboards](#dashboards)
-7. [Acknowledgments](#acknowledgments)
-8. [Conclusion](#conclusion)
-9. [Contacts](#contacts)
+### Kafka • Spark Structured Streaming • Debezium CDC • PostgreSQL • MySQL • Spring Boot • React
 
-## Project Overview
-This project demonstrates real-time data streaming and processing architecture using Kafka, Spark Streaming, and Debezium for capturing CDC (Change Data Capture) events. The pipeline collects transaction data, processes it in real time, and updates a dashboard to display real-time analytics for smartphone data.
+> Enterprise-grade real-time data engineering platform that captures database changes using Change Data Capture (CDC), streams events through Apache Kafka, processes data with Spark Structured Streaming, and delivers real-time analytics dashboards for business intelligence and operational monitoring.
 
-## Technologies Used
-- **Kafka**: Data streaming platform.
-- **Debezium**: Change Data Capture tool to stream changes from PostgreSQL to Kafka.
-- **Spark Streaming**: Real-time data processing engine.
-- **Spring Boot**: Backend API service.
-- **React.js**: Frontend for real-time dashboard.
-- **MySQL**: Database for storing aggregated analytics.
-- **PostgreSQL**: Source database for transactional data.
-- **Docker**: Containerization for running the services.
+![Kafka](https://img.shields.io/badge/Apache-Kafka-black)
+![Spark](https://img.shields.io/badge/Apache-Spark-orange)
+![Debezium](https://img.shields.io/badge/Debezium-CDC-red)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
+![MySQL](https://img.shields.io/badge/MySQL-Analytics-green)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-Backend-success)
+![React](https://img.shields.io/badge/React-Frontend-blue)
 
-## Architecture
-![Architecture Diagram](images/Architecture.png)
+---
 
-### Key Components:
-- **PostgreSQL**: Source database for transactional data.
-- **Debezium**: Captures changes (inserts/updates) from the PostgreSQL database and streams them into Kafka.
-- **Kafka**: Message broker to publish/subscribe to topics.
-- **Spark Streaming**: Consumes data from Kafka, processes it, and writes aggregated results to MySQL.
-- **MySQL**: Stores the processed data for analytics.
-- **Spring Boot**: Provides backend APIs for serving data to the frontend.
-- **React.js**: Frontend that visualizes the processed data in real-time dashboards.
-- **Notification Service**: Sends email notifications to the user when a threshold is reached.
+# 📖 Overview
 
-## Software Requirements for Running the Project
-To run the project, ensure you have the following:
-- **Python**
-- **Java**
-- **Docker** (for setting up Postgres, Debezium, and Kafka)
-- **Apache Spark**
-- **MySQL**
-- **React JS**
+Modern organizations rely on real-time data processing to support operational analytics, fraud detection, customer monitoring, IoT workloads, and business intelligence.
 
-In this project, I used the following tools:
-- **IntelliJ IDEA** for the Spring Boot backend.
-- **Visual Studio Code** for the React.js frontend.
-- **PyCharm** for Python scripts and services.
+This project demonstrates a complete end-to-end streaming data platform using:
 
-## How to Run
-1. **Clone the Project**:
-    ```bash
-    git clone git@github.com:aymane-maghouti/Real-Time-Streaming-Kafka-Debezium-Spark-Streaming.git
-    cd Real-Time-Streaming-Kafka-Debezium-Spark-Streaming
-    ```
+* Apache Kafka
+* Spark Structured Streaming
+* Debezium CDC
+* PostgreSQL
+* MySQL
+* Spring Boot
+* React
+* Docker
 
-2. **Run Docker Compose**:
-    ```bash
-    docker-compose up
-    ```
+The system captures live database changes from PostgreSQL using Debezium Change Data Capture (CDC), streams events through Kafka topics, processes them using Spark Structured Streaming, stores aggregated analytics in MySQL, and presents insights through a real-time dashboard.
 
-   This command will pull the necessary images and start the containers for Kafka, Zookeeper, PostgreSQL, Debezium.
+The architecture simulates production-grade streaming systems used in modern data-driven organizations.
 
-   ![Running Services](images/containers.png)
+---
 
-3. **Create the `smartphones` Table**:
-   After starting the Postgres container, navigate into it and create the `smartphones` table:
-   ```sql
-   CREATE TABLE smartphones (
-       id INT PRIMARY KEY,
-       brand VARCHAR(50),
-       screen_size DECIMAL(3,2),
-       ram DECIMAL(3,1),
-       rom DECIMAL(4,1),
-       sim_type VARCHAR(10),
-       battery DECIMAL(5,1),
-       price DECIMAL(6,1)
-   );
-   ```
+# 🎯 Business Problem
 
-   Then, insert some initial data:
-   ```sql
-   INSERT INTO smartphones (id, brand, screen_size, ram, rom, sim_type, battery, price) VALUES
-   (9, 'Tecno', 6.8, 8.0, 128.0, 'Dual', 5000.0, 2125.0), ...
-   ```
+Organizations generate thousands of transactions every second.
 
-4. **Create Debezium Connector**:
-   You can create a Debezium connector using the UI at `localhost:8080` or by running the following `curl` command inside the Debezium container:
-   ```bash
-   curl -H 'content-type: application/json' localhost:8083/connectors --data '{
-     "name" : "smartphones-conn",
-     "config": {
-       "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-       "topic.prefix": "cdc",
-       "database.user": "postgres",
-       "database.dbname": "smartphone_db",
-       "database.hostname": "postgres",
-       "database.password": "postgres",
-       "database.server.name":"postgres",
-       "database.port": "5432",
-       "plugin.name": "pgoutput",
-       "table.include.list":"public.smartphones",
-       "decimal.handling.mode":"string"
-     }
-   }'
-   ```
+Traditional batch processing introduces delays in:
 
-5. **Set up MySQL Database**:
-   Create a database in MySQL to store the processed data:
-```sql
--- Create the smartphones database 
-create database smartphones;
+* Analytics
+* Monitoring
+* Reporting
+* Alerting
+* Business Decisions
 
-use smartphones;
+This project solves the problem by enabling:
 
---  Create the tables where we will store the data coming from spark streaming job
+✅ Near real-time data ingestion
 
--- 0. Table for statistics_summary
-CREATE TABLE statistics_summary (
-    total_phones INT,
-    max_price DOUBLE,
-    max_screen_size DOUBLE,
-    max_ram DOUBLE,
-    max_rom DOUBLE,
-    max_battery DOUBLE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+✅ Continuous stream processing
 
--- 1. Table for number of phones per brand
-CREATE TABLE phones_per_brand (
-    brand VARCHAR(100),
-    total_phones INT,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (brand)
-);
+✅ Live dashboard updates
 
--- 2. Table for number of phones per sim type
-CREATE TABLE phones_per_sim_type (
-    sim_type VARCHAR(50),
-    total_phones INT,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (sim_type)
-);
+✅ Automated notifications
 
--- 3. Table for max price per brand
-CREATE TABLE max_price_per_brand (
-    brand VARCHAR(100),
-    max_price DOUBLE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (brand)
-);
+✅ Scalable event-driven architecture
 
--- 4. Table for max price per sim type
-CREATE TABLE max_price_per_sim_type (
-    sim_type VARCHAR(50),
-    max_price DOUBLE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (sim_type)
-);
+---
 
--- 5. Table for max RAM per brand
-CREATE TABLE max_ram_per_brand (
-    brand VARCHAR(100),
-    max_ram DOUBLE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (brand)
-);
+# 🏗️ System Architecture
 
--- 6. Table for max ROM per sim type
-CREATE TABLE max_rom_per_sim_type (
-    sim_type VARCHAR(50),
-    max_rom DOUBLE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (sim_type)
-);
-
--- 7. Table for max battery capacity per brand
-CREATE TABLE max_battery_per_brand (
-    brand VARCHAR(100),
-    max_battery DOUBLE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (brand)
-);
-
--- 8. Table for max screen size per sim type
-CREATE TABLE max_screen_size_per_sim_type (
-    sim_type VARCHAR(50),
-    max_screen_size DOUBLE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (sim_type)
-);
-
+```text id="aw9z8w"
+                    PostgreSQL Database
+                           │
+                           ▼
+                  Debezium CDC Connector
+                           │
+                           ▼
+                    Apache Kafka Topics
+                           │
+                           ▼
+               Spark Structured Streaming
+                           │
+           ┌───────────────┴───────────────┐
+           ▼                               ▼
+      MySQL Analytics DB            Alert Engine
+           │                               │
+           ▼                               ▼
+    Spring Boot APIs              Email Notifications
+           │
+           ▼
+      React Dashboard
 ```
 
-6. **Configure and Run Spark Streaming**:
-   Update the database credentials in the script `insert_data.py` located in the `mysql_storage` folder and update your `.env` file with the following:
-   ```
-   EMAIL_SENDER=your-email
-   EMAIL_RECEIVER=user-email
-   EMAIL_PASSWORD=your-password
-   ```
+---
 
-   Then, run the scripts in order:
-   ```bash
-   python insert-data-postgresDb.py
-   python spark-streaming-consumer.py
-   ```
+# 🚀 Key Features
 
-   The first script will insert data into PostgreSQL every 30 seconds, and the second script will process the data in real time using Spark Streaming.
+## Change Data Capture (CDC)
 
-7. **Run the Real-Time App**:
-   - **Backend (Spring Boot)**: Open the Spring Boot app in IntelliJ and run it.
-   - **Frontend (React.js)**: Inside the `real-time-app` folder, run:
-     ```bash
-     npm install
-     npm start
-     ```
+Implemented using Debezium.
 
-   Access the dashboard at `http://localhost:3000`.
+Features:
 
-## Dashboards
-Here's a preview of the real-time dashboard:
+* Real-time database change capture
+* Insert event tracking
+* Update event tracking
+* Event streaming without polling
+* Low-latency synchronization
 
-![Dashboard Overview](images/dashboard.png)
+---
 
+## Real-Time Data Streaming
 
-## Acknowledgments
-Special thanks to the teams and open-source communities behind Kafka, Spark Streaming, Debezium, and Docker for making this project possible.
+Implemented using Apache Kafka.
 
-## Conclusion
-This project showcases how CDC and real-time data processing can be implemented using Kafka, Debezium, and Spark Streaming. It demonstrates a complete flow from data ingestion to processing and visualization in a dashboard.
+Capabilities:
 
-## Contacts
-- **Developer**: Ashrith Vavillapally
-- **Email**: ashrith.31083124@gmail.com
+* High-throughput event ingestion
+* Fault-tolerant messaging
+* Topic-based architecture
+* Distributed event processing
+* Scalability and reliability
 
+---
+
+## Stream Processing
+
+Implemented using Spark Structured Streaming.
+
+Features:
+
+* Continuous data consumption
+* Event filtering
+* Window aggregations
+* Real-time metrics generation
+* Stream transformations
+
+---
+
+## Analytics Layer
+
+Generated business metrics including:
+
+* Total Smartphones
+* Phones Per Brand
+* Phones Per SIM Type
+* Maximum Price Analysis
+* Maximum RAM Analysis
+* Maximum Battery Analysis
+* Screen Size Analytics
+* Brand Performance Metrics
+
+---
+
+## Real-Time Dashboard
+
+Provides:
+
+* Live KPI Monitoring
+* Interactive Visualizations
+* Brand Analytics
+* Device Distribution Insights
+* Operational Monitoring
+
+---
+
+## Alerting System
+
+Email notifications are triggered when predefined thresholds are exceeded.
+
+Examples:
+
+* Price Threshold Alert
+* Inventory Alert
+* Business Rule Violations
+
+---
+
+# 🛠 Technology Stack
+
+## Data Engineering
+
+* Apache Kafka
+* Apache Spark
+* Spark Structured Streaming
+* Debezium CDC
+
+## Programming Languages
+
+* Python
+* Java
+* SQL
+* JavaScript
+
+## Databases
+
+### Source Database
+
+* PostgreSQL
+
+### Analytics Database
+
+* MySQL
+
+## Backend
+
+* Spring Boot
+* REST APIs
+
+## Frontend
+
+* React.js
+* HTML5
+* CSS3
+
+## DevOps
+
+* Docker
+* Docker Compose
+
+## Development Tools
+
+* IntelliJ IDEA
+* VS Code
+* PyCharm
+* Git
+* GitHub
+
+---
+
+# 📊 Data Pipeline Flow
+
+```text id="9jqw7f"
+Database Transaction
+          │
+          ▼
+   Debezium CDC Event
+          │
+          ▼
+      Kafka Topic
+          │
+          ▼
+ Spark Streaming Job
+          │
+          ▼
+ Business Aggregation
+          │
+          ▼
+    MySQL Storage
+          │
+          ▼
+   Spring Boot APIs
+          │
+          ▼
+   React Dashboard
+```
+
+---
+
+# ⚡ Streaming Analytics Implemented
+
+## Aggregations
+
+* Count by Brand
+* Count by SIM Type
+* Maximum Price per Brand
+* Maximum RAM per Brand
+* Maximum Battery per Brand
+* Maximum Screen Size per SIM Type
+
+## Statistical Metrics
+
+* Total Devices
+* Price Trends
+* Device Distribution
+* Product Analytics
+
+---
+
+# 🔒 Reliability & Scalability Features
+
+### Kafka
+
+* Fault Tolerance
+* Event Persistence
+* Horizontal Scalability
+
+### Spark Streaming
+
+* Distributed Processing
+* Stateful Computation
+* Stream Recovery
+
+### Debezium CDC
+
+* Guaranteed Change Capture
+* Low-Latency Processing
+* Consistent Event Delivery
+
+### Docker
+
+* Reproducible Deployments
+* Environment Consistency
+
+---
+
+# 📈 Business Use Cases
+
+This architecture can be extended for:
+
+### E-Commerce
+
+* Order Tracking
+* Inventory Monitoring
+* Sales Analytics
+
+### Banking
+
+* Fraud Detection
+* Transaction Monitoring
+* Risk Analytics
+
+### Telecommunications
+
+* Call Data Processing
+* Customer Usage Analytics
+
+### IoT
+
+* Sensor Monitoring
+* Real-Time Alerts
+
+### Healthcare
+
+* Patient Monitoring
+* Medical Event Processing
+
+---
+
+# 📸 Dashboard Screenshots
+
+Add screenshots for:
+
+```markdown id="m0l0pz"
+Dashboard Overview
+Brand Analytics
+Price Analytics
+Streaming Metrics
+Kafka Topics
+Spark Job Monitoring
+CDC Event Flow
+Email Alerts
+```
+
+---
+
+# 📂 Project Structure
+
+```text id="r2h7fi"
+Real-Time-Streaming-Kafka-Debezium-Spark/
+
+│
+├── postgres/
+├── kafka/
+├── debezium/
+├── spark-streaming/
+├── mysql-storage/
+├── spring-boot-backend/
+├── react-dashboard/
+├── dashboards/
+├── images/
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+# 💼 Resume Project Description
+
+### Real-Time Streaming Analytics Platform | Data Engineer
+
+* Designed and implemented a real-time data engineering platform using Apache Kafka, Spark Structured Streaming, Debezium CDC, PostgreSQL, MySQL, Spring Boot, and React.
+* Developed CDC-based event pipelines to capture database changes, stream events through Kafka, and process high-throughput data streams with low-latency analytics.
+* Built scalable streaming workflows including filtering, aggregation, windowing, and real-time KPI generation for business intelligence applications.
+* Implemented fault-tolerant event processing, automated monitoring, and dashboard visualization to support near real-time operational decision-making.
+
+---
+
+# 🎓 Skills Demonstrated
+
+## Data Engineering
+
+* Real-Time Data Processing
+* Event-Driven Architecture
+* CDC Pipelines
+* Streaming Analytics
+* ETL Development
+
+## Big Data
+
+* Apache Kafka
+* Apache Spark
+* Spark Structured Streaming
+
+## Databases
+
+* PostgreSQL
+* MySQL
+* Data Modeling
+
+## Backend Engineering
+
+* Spring Boot
+* REST APIs
+
+## Frontend Development
+
+* React.js
+* Dashboard Development
+
+## DevOps
+
+* Docker
+* Containerization
+
+---
+
+# 🔮 Future Enhancements
+
+* Apache Airflow Orchestration
+* Kafka Streams
+* Schema Registry
+* Apache Flink Integration
+* Cloud Deployment on AWS
+* Kubernetes Deployment
+* Grafana Monitoring
+* Prometheus Metrics
+* Delta Lake Integration
+* Real-Time Machine Learning
+
+---
+
+# 🔍 ATS Keywords
+
+Data Engineer, Apache Kafka, Spark Structured Streaming, Apache Spark, Debezium, CDC, Change Data Capture, Event Streaming, Real-Time Analytics, Data Pipeline, Streaming Architecture, PostgreSQL, MySQL, Spring Boot, React.js, ETL, Event-Driven Architecture, Distributed Systems, Big Data, Docker, Cloud Data Engineering, Streaming Data Processing, Low Latency Analytics.
+
+---
+
+# 👨‍💻 Author
+
+**Vavillapally Ashrith**
+
+B.Tech Artificial Intelligence & Machine Learning (2026)
+
+Aspiring Data Engineer | Apache Kafka | Spark | Databricks | Cloud Data Engineering
+
+📧 [ashrith.31083124@gmail.com](mailto:ashrith.31083124@gmail.com)
+
+🔗 LinkedIn: linkedin.com/in/vavillapally-ashrith-9823482a1
+
+💻 GitHub: github.com/Ashrith-3108
